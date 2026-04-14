@@ -8,10 +8,10 @@ __pycache__/
 venv/
 env/
 
-# ─── Heavy Data Files (too large for GitHub) ──────────────────────────────────
+# ─── Heavy Data Files ────────────────────────────────────────────────────────
 data/raw/
-data/processed/
-models/
+# NOTE: data/processed/ and models/ ARE committed for cloud deployment
+# They are small (embeddings ~750KB, model ~few MB)
 
 # ─── MLflow Tracking ──────────────────────────────────────────────────────────
 mlruns/

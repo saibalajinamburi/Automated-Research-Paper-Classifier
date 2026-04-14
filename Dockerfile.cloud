@@ -1,0 +1,27 @@
+# Lightweight CPU Dockerfile for cloud deployment (Hugging Face Spaces / Render.com)
+# We do NOT need CUDA in the cloud — the heavy transformer model handles inference fine on CPU
+FROM python:3.10-slim
+
+WORKDIR /project
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install CPU-only torch first (avoids pulling 2.5GB CUDA wheels)
+RUN pip install --no-cache-dir torch==2.5.1 --index-url https://download.pytorch.org/whl/cpu
+
+# Copy and install remaining dependencies
+COPY app/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code and model artifacts
+COPY app/ ./app/
+COPY data/processed/ ./data/processed/
+COPY models/ ./models/
+
+# HuggingFace Spaces runs on port 7860
+EXPOSE 7860
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "7860"]
